@@ -1,12 +1,13 @@
 # 1) choose base container
+# generally use the most recent tag
 
 # data science notebook
 # https://hub.docker.com/repository/docker/ucsdets/datascience-notebook/tags
-ARG BASE_CONTAINER=ucsdets/datascience-notebook:2019.4.5
+ARG BASE_CONTAINER=ucsdets/datascience-notebook:2019.4.7
 
 # scipy/machine learning (tensorflow)
-# https://hub.docker.com/repository/docker/ucsdets/datascience-notebook/tags
-#ARG BASE_CONTAINER=ucsdets/scipy-ml-notebook:2019.4.5
+# https://hub.docker.com/repository/docker/ucsdets/scipy-ml-notebook/tags
+#ARG BASE_CONTAINER=ucsdets/scipy-ml-notebook:2019.4.6
 
 FROM $BASE_CONTAINER
 
