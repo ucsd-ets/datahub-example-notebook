@@ -3,11 +3,11 @@
 
 # data science notebook
 # https://hub.docker.com/repository/docker/ucsdets/datascience-notebook/tags
-ARG BASE_CONTAINER=ucsdets/datascience-notebook:2019.4.7
+ARG BASE_CONTAINER=ucsdets/datascience-notebook:2020.2-stable
 
 # scipy/machine learning (tensorflow)
 # https://hub.docker.com/repository/docker/ucsdets/scipy-ml-notebook/tags
-#ARG BASE_CONTAINER=ucsdets/scipy-ml-notebook:2019.4.6
+# ARG BASE_CONTAINER=ucsdets/scipy-ml-notebook:2020.2-stable
 
 FROM $BASE_CONTAINER
 
@@ -22,4 +22,5 @@ RUN	apt-get install htop
 RUN pip install --no-cache-dir networkx scipy python-louvain
 
 # 4) change back to notebook user
+COPY /run_jupyter.sh /
 USER $NB_UID
