@@ -1,6 +1,6 @@
 # Instructions on Building a Custom Image for DataHub/DSMLP
 
-This guide is for advanced DataHub/DSMLP users (both students and instructors) who want to add or modify applications on their working environment using a custom Docker container. 
+This guide is for advanced DSMLP users (both students and instructors) who want to add or modify applications on their working environment using a custom Docker container. 
 
 ## Introduction
 
@@ -68,7 +68,7 @@ It is recommended to try both routes for easier debugging and shorter turnaround
 # Tips
 
 - If you are repeatedly using the pod or sharing the custom image among a few other people within a day, use the same node to reduce spawn time (without download). You can do this by adding a `-n <node-number>` at the end of the launch command.
-<!-- - Jupyter notebook -->
+- To disable launching jupyter notebook upon entry, override the default executable by adding `CMD ["/bin/bash"]` as the last layer (as last line in `Dockerfile`). You can always launch the notebook again and manually port-forward on dsmlp-login. `kubectl port-forward pods/<POD_NAME> <DSMLP_PORT>:8888`
 
 # Resources/Further Reading
 - [Best practices for writing Dockerfiles](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)
