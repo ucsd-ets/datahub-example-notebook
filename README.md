@@ -17,6 +17,7 @@ A Docker **image** is a snapshot of packaged applications, dependencies and the 
 ## Step 1: Customize the Dockerfile
 
 - Choose the base container by uncommenting the corresponding line that set the `BASE_CONTAINER` argument
+  - [An overview of standard Datahub/DSMLP containers maintained by UCSD EdTech Services](https://support.ucsd.edu/its?id=kb_article_view&sysparm_article=KB0032173&sys_kb_id=12459737dbe69810a4bc41db13961976)
   - `datascience-notebook` base image includes conda and basic python packages for data science (pandas, scipy, matplotlib) from [miniconda](https://docs.conda.io/en/latest/miniconda.html).
   - `scipy-ml` image has a wider range of packages including tensorflow, pytorch, including CUDA 10 support, generally used for GPU-accelerated workflows.
   - Note: Although `scipy-ml` has more functionality, the build process may take longer and result in a larger image.
