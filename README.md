@@ -1,82 +1,52 @@
-# Instructions on Building a Custom Image for DataHub/DSMLP
+# Building CUDA-enabled Images for DataHub/DSMLP
 
-This guide is for advanced DSMLP users (both students and instructors) who want to add or modify applications on their working environment using a custom Docker container. 
+In this branch we will cover the starting steps of creating a GPU accelerated Docker Image for DSMLP. It's recommended to follow the steps in the "master" branch before continuing.
 
-## Introduction
+## DSMLP: Available GPUs
 
-A Docker **image** is a snapshot of packaged applications, dependencies and the underlying operating system. Users can use the same Docker image anywhere on any machine running the Docker platform while having the same software functionality and behavior. **DockerHub** is a public container registry you can download ("pull") and upload ("push") Docker images. Just like GitHub hosts git repositories, DockerHub hosts and distributes Docker images. In this guide, we will design a custom Docker image by modifying a **Dockerfile**, build the image and publish it on DockerHub. 
+As of Fall 2020, there are 15 GPU nodes on the DSMLP cluster available for classroom use, and each node has 8 NVIDIA GPUs installed. These GPUs are dynamically assigned to a container on start-up when requested and will stay attached until that container is deleted, meaning a GPU will remain occupied even if it's actually not running anything.
 
-Building and maintaining a Docker image follows three essential steps: build, share and deploy/test. It's likely for you to go through these steps several times until it achieves what you want. You can find an official tutorial from [docs.docker.com](https://docs.docker.com/get-started/) that demonstrates a general case, but this document is tailored specifically for DSMLP users.
+The graphics driver will be installed automatically to the container on start-up. The current driver version is `418.88`. Because of this, the latest CUDA Tookit that is supported on DSMLP is version `10.1`, according to [NVIDIA](https://docs.nvidia.com/deploy/cuda-compatibility/index.html#binary-compatibility__table-toolkit-driver).
 
-## Step 0: Prerequisites
+| GPU Model      | VRAM | Amount | Node                            |
+|----------------|------|--------|---------------------------------|
+| NVIDIA 1080 Ti | 11GB | 80     | n01 through n12 except n09, n10 |
+| NVIDIA 2080 Ti | 11GB | 32     | n18, n21, n22, n24              |
+| NVIDIA 1070 Ti | 8GB  | 7      | n10                             |
 
-- A new GitHub git repo using this as a template. Click "Use this template" at upper-right corner. You can also use an existing repo by adding a `Dockerfile` at the repo's root level.
+## Dockerfile: Choosing a Base Image
 
-- A Docker Hub account. Register at <https://hub.docker.com/>. You will need this for publishing your new image and configuring automated builds.
+It's advised to use the ETS provided image `ucsdets/datahub-base-notebook` for a datahub-like experience. However, you can use any image from the DockerHub community (or even other public Container Registries). We will use the `jupyter/scipy-notebook` image from [Jupyter Docker Stacks](https://jupyter-docker-stacks.readthedocs.io/en/latest/). For `ucsdets/datahub-base-notebook`, ETS uses `jupyter/datascience-notebook` as the base image and installs addtional software. `jupyter/scipy-notebook`, being the base image or `jupyter/datascience-notebook`, is smaller but has less functionality / fewer libraries.
 
-- A new *public* repository on DockerHub. The name don't have to be the same as your git repo.
+## Dockerfile: CUDA Tookit
 
-## Step 1: Customize the Dockerfile
+Choosing the right version of CUDA is important because some legacy codebase relies on specific old versions of CUDA and their compatible software in order to run. We will use CUDA `10.1` for this example.
 
-- Choose the base container by uncommenting the corresponding line that set the `BASE_CONTAINER` argument
-  - [An overview of standard Datahub/DSMLP containers maintained by UCSD EdTech Services](https://support.ucsd.edu/its?id=kb_article_view&sysparm_article=KB0032173&sys_kb_id=12459737dbe69810a4bc41db13961976)
-  - `datascience-notebook` base image includes conda and basic python packages for data science (pandas, scipy, matplotlib) from [miniconda](https://docs.conda.io/en/latest/miniconda.html).
-  - `scipy-ml` image has a wider range of packages including tensorflow, pytorch, including CUDA 10 support, generally used for GPU-accelerated workflows.
-  - Note: Although `scipy-ml` has more functionality, the build process may take longer and result in a larger image.
+The following command let conda install CUDA Toolkit `10.1` along with a deep learning accelerator (cuDNN) and a device communication library (NCCL).
 
-- Use `USER root` to gain root privileges for installing system packages. This line is already typed out for you.
+```
+RUN conda install -y cudatoolkit=10.1 cudnn nccl
+```
 
-- Install system-level packages using `apt-get`
-  - The example at line 19 installs a system utility called `htop`.
-  - Specify more packages as extra arguments: `apt-get -y install htop ping`
+In the example Dockerfile, the above command is followed by `conda clean --all -f -y`, which cleans up the unnecessary cache. The two commands are executed sequentially with `&&` in between in order to reduce overall size in that layer.
 
-- Install conda packages
-  - Use `RUN conda install --yes <package1> <package2>` to install all required conda packages in one go
-  - (Optional) Use `RUN conda clean -tipy` to reduce image size
-  - Recommended: Use conda to install least amount of packages required. Solving conda dependency graphs takes a much longer time than using pip.
+## Dockerfile: Deep Learning Libraries
 
-- Install pip packages
-  - Use `pip install --no-cache-dir <package>`
-  - Provide arguments in the same command for installing multiple pip packages
+### TensorFlow
 
-- Leave the rest of the Dockerfile as is
+There are two major versions of tensorflow APIs and they cannot coexist in the same environment. Look into the Dockerfile for the commands. Using `tensorflow` will get the latest `2.*` version. 
 
+### PyTorch
 
-## Step 2: Build the Image
+Installing PyTorch will require you to go on their [website](https://pytorch.org/get-started/locally/#start-locally), select the appropriate specifications for the system and paste in the command. Remember to add `--no-cache-dir` after `pip install` to reduce image size.
 
-In this step you will build the image using the Dockerfile you created. Here you have two options: 
-1. Build the image locally and push (upload) it to DockerHub. This will require you have [Docker Desktop](https://www.docker.com/products/docker-desktop) installed on your local Windows PC/Mac or [Docker Engine](https://docs.docker.com/engine/install/) for Linux. 
-2. Make use of the free [automated build](https://docs.docker.com/docker-hub/builds/#configure-automated-build-settings) service and DockerHub will build and distribute the image for you. If you are feeling confident, go straight to this option, but it is quite difficult to debug and pinpoint the build issue if there is one.
+## Dockerfile: Additional Kernels
 
-It is recommended to try both routes for easier debugging and shorter turnaround time on successful builds. If you don't want to install Docker on your local machine, you can always use a $50 DigitalOcean credit from the [GitHub Student Developer Pack](https://education.github.com/pack) and launch a Docker Droplet there.
+To install a new kernel that can be selected within a jupyter notebook, you can look into creating a second conda environment and use [nb_conda_kernels](https://github.com/Anaconda-Platform/nb_conda_kernels) to add it in. 
 
-### Option 1: Use Docker Desktop/Docker Engine
-- After Docker is installed, launch a terminal and navigate to the git directory containing the Dockerfile.
-- Type `docker build -t test .` and hit Enter. Docker will build the image according to the local Dockerfile. The resulting image will be labeled test. If the build fails, take note of the last command Docker ran and start debugging from there. Run the command again to rebuild after the Dockerfile is edited.
-- Once the image is successfully built, use `docker run --rm -it test /bin/bash` to enter the image in a container. Test if it has all the functionality you want. Use `exit` to exit from the container. The container will be automatically deleted.
-- (Optional if option 2 is also used) Log in to DockerHub on your local Docker instance. Retag the image by using `docker tag test <dockerhub-username>/<dockerhub-repo>`. And push the image `docker push <dockerhub-username>/<dockerhub-repo>`.
-- Another method for modifying the image without modifying the image is by doing changes in a lasting container from `docker run -it test /bin/bash`, use CTRL+P-Q to detach from container, find the running container in `docker ps` and `docker commit CONTAINER_ID <dockerhub-username>/<dockerhub-repo>` followed by `docker push <dockerhub-username>/<dockerhub-repo>`.
-
-### Option 2: Setup automated builds on DockerHub
-- Commit and push local changes to GitHub
-- Link GitHub account to DockerHub: [instructions](https://docs.docker.com/docker-hub/builds/link-source/#link-to-a-github-user-account)
-- Set up automated builds: [instructions](https://docs.docker.com/docker-hub/builds/link-source/#link-to-a-github-user-account). Note the default build rule has the source branch set as `master`, which is [no longer](https://github.com/github/renaming#new-repositories-use-main-as-default-branch-name) the default branch name (`main`) for GitHub.
-- Wait for the build to finish. It can take up to 2 hours for a complex build during business hours. Occasionally refresh the DockerHub page to get a status update -- it doesn't refresh automatically once it's complete.
-
-## Step 3: Launch a Pod on DSMLP
-- SSH to `dsmlp-login.ucsd.edu`
-- RUN `launch-scipy-ml.sh -i <dockerhub-username>/<dockerhub-repo> -P Always` . The `-P` flag will force the docker host to sync for the latest version of the image manifest. Note: a docker image name follows the format `<user>/<image>:<tag>`. The `:<tag>` part will be assumed to be `:latest` if you don't supply it to the launch script. Use tags like `v1` or `test` in the build step to have control over different versions of the same docker image.
-- Wait for the node to download the image. Download time depends on the image size.
-- If it timeout/fails to launch, check `kubectl logs <pod-name>` or contact ETS service desk for help.
-
-
-# Tips
-
-- If you are repeatedly using the pod or sharing the custom image among a few other people within a day, use the same node to reduce spawn time (without download). You can do this by adding a `-n <node-number>` at the end of the launch command.
-- To disable launching jupyter notebook upon entry, override the default executable by adding `CMD ["/bin/bash"]` as the last layer (as last line in `Dockerfile`). You can always launch the notebook again and manually port-forward on dsmlp-login. `kubectl port-forward pods/<POD_NAME> <DSMLP_PORT>:8888`
+<!-- ## Dockerfile: Write Access to /opt/conda -->
 
 # Resources/Further Reading
 - [**DSMLP Knowledge Base Articles**](https://support.ucsd.edu/its?id=kb_category&kb_category=7defd803db49fb08bd30f6e9af961979&kb_id=e343172edb3c1f40bd30f6e9af961996)
-- [Best practices for writing Dockerfiles](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)
-- [Docker Cheat Sheet (pdf)](https://www.docker.com/sites/default/files/d8/2019-09/docker-cheat-sheet.pdf)
-- [Original version of this guide](https://docs.google.com/document/d/1LPfqHvk2Itm_ckafrxRVxXQdr5BSozjsv_TURQDj9x8/edit)
+- [CUDA Compatibility Table](https://docs.nvidia.com/deploy/cuda-compatibility/index.html#binary-compatibility__table-toolkit-driver)
+- [cuDNN Support Matrix](https://docs.nvidia.com/deeplearning/cudnn/support-matrix/index.html)
