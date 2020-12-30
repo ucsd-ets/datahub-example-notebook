@@ -1,6 +1,8 @@
 # Instructions on Building a Custom Image for DataHub/DSMLP
 
-This guide is for advanced DSMLP users (both students and instructors) who want to add or modify applications on their working environment using a custom Docker container. 
+This guide is for advanced DSMLP users (both students and instructors) who want to add or modify applications on their working environment using a custom Docker container.
+
+For CUDA-enabled images, switch to the `cuda-10.1` [branch](https://github.com/ucsd-ets/datahub-example-notebook/tree/cuda10.1) for more information.
 
 ## Introduction
 
