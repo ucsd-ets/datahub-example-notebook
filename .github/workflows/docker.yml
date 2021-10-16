@@ -1,0 +1,44 @@
+name: Docker Workflow
+
+on:
+  push:
+    branches:
+    - main
+    - master
+    paths:
+      - "requirements.txt"
+      - "Dockerfile"
+      - ".github/workflows/main.yml"
+  workflow_dispatch:
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set Variables
+        run: |
+          IMAGE_NAME=""
+          DOCKERHUB_USERNAME=""
+          echo "IMAGE_NAME=${IMAGE_NAME}" >> $GITHUB_ENV
+          echo "DOCKERHUB_USERNAME=${DOCKERHUB_USERNAME}" >> $GITHUB_ENV
+
+      - name: Build Image
+        run: |
+          docker build --rm --force-rm -t "${IMAGE_NAME}" .
+          echo -n "Built image size: "
+          docker images "${IMAGE_NAME}" --format "{{.Size}}"
+
+      # - name: List Installed Packages
+      #   run:  >
+      #     docker run --rm "${IMAGE_NAME}"
+      #     conda list
+
+      - name: Login to Dockerhub
+        run: >
+          echo '${{secrets.DOCKERHUB_PASSWORD}}' | docker login
+          -u "${DOCKERHUB_USERNAME}" --password-stdin
+
+      - name: Push to Dockerhub
+        run: docker push "${IMAGE_NAME}"
