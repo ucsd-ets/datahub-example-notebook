@@ -110,6 +110,8 @@ Some commmon errors/mistakes here include:
 
 - push the image `docker push <image-fullname>`, the tag will default to `latest`. If you want to push a different tag, add `:<tag>` at the end of the full name.
 
+- If you are using a remote pay-as-you-go Linux VM such as DigitalOcean, don't forget to remove the instance to save cost!
+
 ### ~~Option 2: Setup automated builds on Docker Hub~~
 
 ### Option 2: Use Github Actions
@@ -155,5 +157,5 @@ For more information, check out the syntax for Github Actions and relevant docum
 
 # Appendix
 
-- [DigitalOcean Docker Droplet](https://marketplace.digitalocean.com/apps/docker), this will give you a Linux VM with Docker installed ready to go.
+- [DigitalOcean Docker Droplet](https://marketplace.digitalocean.com/apps/docker), this will give you a Linux VM with Docker installed ready to go. Start with any configuration with at least 8GB of memory and up it if working with a large image.
 - [GitHub Student Developer Pack](https://education.github.com/pack)
