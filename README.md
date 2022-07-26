@@ -10,15 +10,11 @@ A Docker **image** is a snapshot of packaged applications, dependencies and the 
 
 Building and maintaining a Docker image follows three essential steps: build, share and deploy/test. It's likely for you to go through these steps several times until it achieves what you want. You can find an official tutorial from [docs.docker.com](https://docs.docker.com/get-started/) that demonstrates a general case, but this document is tailored specifically for DSMLP users.
 
-### New changes June 2021
-
-Docker Hub has modified its free plan, [removing](https://www.docker.com/blog/changes-to-docker-hub-autobuilds/) the Autobuilds feature that many users rely on for building images on Docker Hub's infrastructure, for free. The contents of this guide will reflect on that change and no longer recommend Docker Hub as a *build* platform.
-
 ## Step 0: Prerequisites
 
 - A new **public** GitHub git repo using this as a template. Click "Use this template" at upper-right corner. You can also use an existing **public** repo by adding a `Dockerfile` at the repo's root level. The public visibility is to stay on the free plan that GitHub offers, which comes in to play later.
 
-- A Docker Hub account. Register at <https://hub.docker.com/>. You will need this for publishing your new image ~~and configuring automated builds~~.
+- A Docker Hub account. Register at <https://hub.docker.com/>. You will need this for publishing your new image
 
 - A new **public** repository on Docker Hub. The name for it doesn't have to be the same as your GitHub repo.
 
@@ -29,7 +25,7 @@ Docker Hub has modified its free plan, [removing](https://www.docker.com/blog/ch
 ### Step 1.1 Base Imagee
 
 - Choose the base container by uncommenting the corresponding line that sets the `BASE_CONTAINER` argument
-  - [An overview of standard Datahub/DSMLP containers maintained by UCSD EdTech Services](https://support.ucsd.edu/its?id=kb_article_view&sysparm_article=KB0032173&sys_kb_id=12459737dbe69810a4bc41db13961976)
+  - [An overview of standard Datahub/DSMLP containers maintained by UCSD EdTech Services](https://github.com/ucsd-ets/datahub-docker-stack/wiki/Stable-Tag)
   - The `datahub-base-notebook` image contains Jupyter and common data science tools from Python and R. Derived from [`jupyter/datascience-notebook`](https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-datascience-notebook).
   - The `datascience-notebook` image has a few more packages installed using pip.
   - The `scipy-ml` image has a wider range of packages including tensorflow, pytorch, including CUDA 11 support, generally used for GPU-accelerated workflows.
@@ -65,8 +61,6 @@ Docker Hub has modified its free plan, [removing](https://www.docker.com/blog/ch
 In this step you will build the image using the Dockerfile you created. Here you have two options: 
 
 1. Install the Docker Client and build the image locally and push (upload) it to Docker Hub. This will require you have [Docker Desktop](https://www.docker.com/products/docker-desktop) installed on your local Windows PC/Mac or [Docker Engine](https://docs.docker.com/engine/install/) on Linux. You can also use a remote Linux server with Docker installed for building Docker Images and testing them. The commands will be the same, but if you don't have docker locally, you cannot develop locally, only on DSMLP. For development on Windows, I strongly recommend you to install the [WSL 2 engine](https://docs.microsoft.com/en-us/windows/wsl/install) for a better experience.
-
-2. ~~Make use of the free [automated build](https://docs.docker.com/docker-hub/builds/#configure-automated-build-settings) service and Docker Hub will build and distribute the image for you. If you are feeling confident, go straight to this option, but it is quite difficult to debug and pinpoint the build issue if there is one.~~ Removed since no longer free
 
 2. Setup a [GitHub Actions](https://github.com/features/actions) configuration file inside your project. A template is provided and require minimum modification.
 
@@ -112,19 +106,17 @@ Some commmon errors/mistakes here include:
 
 - If you are using a remote pay-as-you-go Linux VM such as DigitalOcean, don't forget to remove the instance to save cost!
 
-### ~~Option 2: Setup automated builds on Docker Hub~~
-
 ### Option 2: Use Github Actions
 
 After going through the previous option, you should be familiar with the entire workflow of building, testing, and pushing the Docker image. Now we can use Github Actions to automatically do these things for us, for free!
 
-1. Make a new file `.github/workflows/docker.yml` along with the directories that contains it. Notice here the `.github` will be a hidden directory, which can be hidden graphically on Windows if you don't have that setting enabled.
+1. Follow the file at `.github/workflows/docker.yml`. Notice here the `.github` will be a hidden directory, which can be hidden graphically on Windows if you don't have that setting enabled. This workflow uses a [standard action](https://github.com/marketplace/actions/build-and-push-docker-images) for building and pushing Docker images to Dockerhub
 
-2. Here we will use the same file in this repo as a template for yours. This is a YAML configuration file with the syntax used for Github Workflows. In `jobs.docker.steps.[1]`, fill in your `<image-fullname>` from earlier and your Docker Hub username.
+2. At the last action `Build and push`, change the tag on `line 36` to the Dockerhub repository of your choosing. For this example, it's `ucsdets/datahub-example-notebook:test`.
 
 3. Leave the rest of the content as is. You will find that it contains all the necessary steps in Option 1. If you are feeling confident, add more steps to augment the workflow.
 
-4. **Important**: Go to your Github repo's settings, under "Secrets", make a "New Repository Secret". Use the name "`DOCKERHUB_PASSWORD`" and fill in the token saved from the prerequisites. When this action is run, the secret is passed in and will be hidden in the workflow logs, which are public.
+4. **Important**: Go to your Github repo's settings, under "Secrets", make a "New Repository Secret". Use the name "`DOCKERHUB_TOKEN`" and fill in the token saved from the prerequisites and "`DOCKERHUB_USERNAME`". When this action is run, the secret is passed in and will be hidden in the workflow logs, which are public.
 
 5. Commit and push the changes to GitHub. In the "Actions" tab, there will be a new workflow and under there, you can check the progress and output.
 
