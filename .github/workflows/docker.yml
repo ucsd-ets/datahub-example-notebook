@@ -33,4 +33,4 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: ucsets/datahub-example-notebook:test
+          tags: ucsdets/datahub-example-notebook:test
