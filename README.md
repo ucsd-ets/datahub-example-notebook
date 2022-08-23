@@ -109,7 +109,7 @@ After going through the previous option, you should be familiar with the entire 
 
 1. Follow the file at `.github/workflows/docker.yml`. Notice here the `.github` will be a hidden directory, which can be hidden graphically on Windows if you don't have that setting enabled. This workflow uses a [standard action](https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions) for building and pushing Docker images to GHCR
 
-2. At the action `Extra Docker metadata`, change the tag on `line 69` to the tag of your choosing. For this example, the image and tag will render to `ghcr.io/ucsd-ets/datahub-example-notebook:test`.
+2. At the action `Extra Docker metadata`, change the tag on `line 69` to the tag of your choosing (see [here](https://github.com/docker/metadata-action#tags-input) for all `tags` options). For this example, the image and tag will render to `ghcr.io/ucsd-ets/datahub-example-notebook:test`.
 
 3. Leave the rest of the content as is. You will find that it contains all the necessary steps in Option 1. If you are feeling confident, add more steps to augment the workflow.
 
