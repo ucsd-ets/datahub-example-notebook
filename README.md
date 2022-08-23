@@ -2,27 +2,25 @@
 
 This guide is for advanced DSMLP users (both students and instructors) who want to add or modify applications on their working environment using a custom Docker container.
 
+- TODO, update this to a subsection
 For CUDA-enabled images, switch to the `cuda` branch for more information.
 
 ## Introduction
 
-A Docker **image** is a snapshot of packaged applications, dependencies and the underlying operating system. Users can use the same Docker image anywhere on any machine running the Docker platform while having the same software functionality and behavior. **Docker Hub** is a public container registry you can download ("pull") and upload ("push") Docker images. Just like GitHub hosts git repositories, Docker Hub hosts and distributes Docker images. In this guide, we will build a custom Docker image by modifying a **Dockerfile**, building the image on a desired platform, and publishing it on Docker Hub.
+A Docker **image** is a snapshot of packaged applications, dependencies and the underlying operating system. Users can use the same Docker image anywhere on any machine running the Docker platform while having the same software functionality and behavior. **Github Container Registry (GHCR)** is a public container registry you can download ("pull") and upload ("push") Docker images located under the **Packages** section of this Github repo. In this guide, we will build a custom Docker image by modifying a **Dockerfile**, building the image on a desired platform, and publishing it on GHCR.
+
+**Docker Hub** is also a public container registry you can download ("pull") and upload ("push") Docker images. In other words, Docker Hub hosts and distributes Docker images just like GHCR.
 
 Building and maintaining a Docker image follows three essential steps: build, share and deploy/test. It's likely for you to go through these steps several times until it achieves what you want. You can find an official tutorial from [docs.docker.com](https://docs.docker.com/get-started/) that demonstrates a general case, but this document is tailored specifically for DSMLP users.
 
 ## Step 0: Prerequisites
 
 - A new **public** GitHub git repo using this as a template. Click "Use this template" at upper-right corner. You can also use an existing **public** repo by adding a `Dockerfile` at the repo's root level. The public visibility is to stay on the free plan that GitHub offers, which comes in to play later.
-
-- A Docker Hub account. Register at <https://hub.docker.com/>. You will need this for publishing your new image
-
-- A new **public** repository on Docker Hub. The name for it doesn't have to be the same as your GitHub repo.
-
-- Create an Access Token on Docker Hub account. Follow this [documentation]. Name it "For Github Actions" and save the generated token locally.
+- An **optional** Docker Hub account if following [Option 1, Push](#option-1:-use-docker-desktop/docker-engine)
 
 ## Step 1: Customize the Dockerfile
 
-### Step 1.1 Base Imagee
+### Step 1.1 Base Image
 
 - Choose the base container by uncommenting the corresponding line that sets the `BASE_CONTAINER` argument
   - [An overview of standard Datahub/DSMLP containers maintained by UCSD EdTech Services](https://github.com/ucsd-ets/datahub-docker-stack/wiki/Stable-Tag)
@@ -60,7 +58,7 @@ Building and maintaining a Docker image follows three essential steps: build, sh
 
 In this step you will build the image using the Dockerfile you created. Here you have two options: 
 
-1. Install the Docker Client and build the image locally and push (upload) it to Docker Hub. This will require you have [Docker Desktop](https://www.docker.com/products/docker-desktop) installed on your local Windows PC/Mac or [Docker Engine](https://docs.docker.com/engine/install/) on Linux. You can also use a remote Linux server with Docker installed for building Docker Images and testing them. The commands will be the same, but if you don't have docker locally, you cannot develop locally, only on DSMLP. For development on Windows, I strongly recommend you to install the [WSL 2 engine](https://docs.microsoft.com/en-us/windows/wsl/install) for a better experience.
+1. Install the Docker Client and build the image locally. This will require you have [Docker Desktop](https://www.docker.com/products/docker-desktop) installed on your local Windows PC/Mac or [Docker Engine](https://docs.docker.com/engine/install/) on Linux. You can also use a remote Linux server with Docker installed for building Docker Images and testing them. The commands will be the same, but if you don't have docker locally, you cannot develop locally, only on DSMLP. For development on Windows, I strongly recommend you to install the [WSL 2 engine](https://docs.microsoft.com/en-us/windows/wsl/install) for a better experience.
 
 2. Setup a [GitHub Actions](https://github.com/features/actions) configuration file inside your project. A template is provided and require minimum modification.
 
@@ -108,19 +106,17 @@ Some commmon errors/mistakes here include:
 
 ### Option 2: Use Github Actions
 
-After going through the previous option, you should be familiar with the entire workflow of building, testing, and pushing the Docker image. Now we can use Github Actions to automatically do these things for us, for free!
+After going through the previous option, you should be familiar with the entire workflow of building, testing, and pushing the Docker image. Now we can use Github Actions to automatically do these things for us.
 
-1. Follow the file at `.github/workflows/docker.yml`. Notice here the `.github` will be a hidden directory, which can be hidden graphically on Windows if you don't have that setting enabled. This workflow uses a [standard action](https://github.com/marketplace/actions/build-and-push-docker-images) for building and pushing Docker images to Dockerhub
+1. Follow the file at `.github/workflows/docker.yml`. Notice here the `.github` will be a hidden directory, which can be hidden graphically on Windows if you don't have that setting enabled. This workflow uses a [standard action](https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions) for building and pushing Docker images to GHCR
 
-2. At the last action `Build and push`, change the tag on `line 36` to the Dockerhub repository of your choosing. For this example, it's `ucsdets/datahub-example-notebook:test`.
+2. At the action `Extra Docker metadata`, change the tag on `line 69` to the tag of your choosing. For this example, the image and tag will render to `ghcr.io/ucsd-ets/datahub-example-notebook:test`.
 
 3. Leave the rest of the content as is. You will find that it contains all the necessary steps in Option 1. If you are feeling confident, add more steps to augment the workflow.
 
-4. **Important**: Go to your Github repo's settings, under "Secrets", make a "New Repository Secret". Use the name "`DOCKERHUB_TOKEN`" and fill in the token saved from the prerequisites and "`DOCKERHUB_USERNAME`". When this action is run, the secret is passed in and will be hidden in the workflow logs, which are public.
+4. Commit and push the changes to GitHub. In the "Actions" tab, there will be a new workflow and under there, you can check the progress and output.
 
-5. Commit and push the changes to GitHub. In the "Actions" tab, there will be a new workflow and under there, you can check the progress and output.
-
-6. The triggers for this workflow are narrowly defined. It will only run if any of `["requirements.txt", "Dockerfile", ".github/workflows/main.yml"]` is changed in the `main` or `master` branch. Feel free to modify this behavior.
+5. The triggers for this workflow are narrowly defined. It will only run if any of `["requirements.txt", "Dockerfile", ".github/workflows/main.yml"]` is changed in the `main` or `master` branch. Feel free to modify this behavior.
 
 For more information, check out the syntax for Github Actions and relevant documentation, [here](https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions).
 
