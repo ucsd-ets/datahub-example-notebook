@@ -6,7 +6,7 @@ For CUDA-enabled images, checkout [cuda.md](cuda.md).
 
 ## Introduction
 
-A Docker **image** is a snapshot of packaged applications, dependencies and the underlying operating system. Users can use the same Docker image anywhere on any machine running the Docker platform while having the same software functionality and behavior. **Github Container Registry (GHCR)** is a public container registry you can download ("pull") and upload ("push") Docker images located under the **Packages** section of this Github repo. In this guide, we will build a custom Docker image by modifying a **Dockerfile**, building the image on a desired platform, and publishing it on GHCR.
+A Docker **image** is a snapshot of packaged applications, dependencies and the underlying operating system. Users can use the same Docker image anywhere on any machine running the Docker platform while having the same software functionality and behavior. **Github Container Registry (GHCR)** is a public container registry you can download ("pull") and upload ("push") Docker images located under the **[Packages](https://github.com/orgs/ucsd-ets/packages?repo_name=datahub-example-notebook)** section of this Github repo. In this guide, we will build a custom Docker image by modifying a **Dockerfile**, building the image on a desired platform, and publishing it on GHCR.
 
 **Docker Hub** is also a public container registry you can download ("pull") and upload ("push") Docker images. In other words, Docker Hub hosts and distributes Docker images just like GHCR.
 
@@ -116,6 +116,8 @@ After going through the previous option, you should be familiar with the entire 
 4. Commit and push the changes to GitHub. In the "Actions" tab, there will be a new workflow and under there, you can check the progress and output.
 
 5. The triggers for this workflow are narrowly defined. It will only run if any of `["requirements.txt", "Dockerfile", ".github/workflows/main.yml"]` is changed in the `main` or `master` branch. Feel free to modify this behavior.
+   
+6. If your Github action was successful, you'll see a newly created package under [Packages](https://github.com/orgs/ucsd-ets/packages?repo_name=datahub-example-notebook)
 
 For more information, check out the syntax for Github Actions and relevant documentation, [here](https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions).
 
