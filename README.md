@@ -2,7 +2,7 @@
 
 This guide is for advanced DSMLP users (both students and instructors) who want to add or modify applications on their working environment using a custom Docker container.
 
-For CUDA-enabled images, checkout (cuda.md)[cuda.md].
+For CUDA-enabled images, checkout [cuda.md](cuda.md).
 
 ## Introduction
 
