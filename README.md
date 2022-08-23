@@ -2,8 +2,7 @@
 
 This guide is for advanced DSMLP users (both students and instructors) who want to add or modify applications on their working environment using a custom Docker container.
 
-- TODO, update this to a subsection
-For CUDA-enabled images, switch to the `cuda` branch for more information.
+For CUDA-enabled images, checkout (cuda.md)[cuda.md].
 
 ## Introduction
 
@@ -135,6 +134,10 @@ For more information, check out the syntax for Github Actions and relevant docum
 - If you are repeatedly using the pod or sharing the custom image among a few other people within a day, use the same node to reduce spawn time (without download). You can do this by adding a `-n <node-number>` at the end of the launch command.
 
 - To disable launching jupyter notebook upon entry, override the default executable by adding `CMD ["/bin/bash"]` as the last layer (as last line in `Dockerfile`). You can always launch the notebook again and manually port-forward on dsmlp-login. `kubectl port-forward pods/<POD_NAME> <DSMLP_PORT>:8888`
+
+# Adding CUDA support
+
+
 
 # Resources/Further Reading
 
