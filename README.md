@@ -125,7 +125,7 @@ For more information, check out the syntax for Github Actions and relevant docum
 
 - SSH to `dsmlp-login.ucsd.edu`
 
-- RUN `launch-scipy-ml.sh -i <image-fullname> -P Always` . The `-P Always` flag will force the docker host to sync, as it pulls the latest version of the image manifest. Note: a docker image name follows the format `<user>/<image>:<tag>`. The `:<tag>` part will be assumed to be `:latest` if you don't supply it to the launch script. Use tags like `v1` or `test` in the build step to have control over different versions of the same docker image.
+- RUN `launch-scipy-ml.sh -i <image-fullname> -P Always` . The `-P Always` flag will force the docker host to sync, as it pulls the latest version of the image manifest. You will not need the `-P Always` flag once you are done with development. Note: a docker image name follows the format `<user>/<image>:<tag>`. The `:<tag>` part will be assumed to be `:latest` if you don't supply it to the launch script. Use tags like `v1` or `test` in the build step to have control over different versions of the same docker image.
 
 - Wait for the node to download the image. Download time depends on the image size.
 
