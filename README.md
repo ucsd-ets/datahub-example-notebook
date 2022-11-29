@@ -114,10 +114,8 @@ After going through the previous option, you should be familiar with the entire 
 2. Leave the rest of the content as is. You will find that it contains all the necessary steps in Option 1. If you are feeling confident, add more steps to augment the workflow.
 
 3. Commit and push the changes to GitHub. In the "Actions" tab, there will be a new workflow and under there, you can check the progress and output.
-
-4. The triggers for this workflow are narrowly defined. It will only run if any of `["requirements.txt", "Dockerfile", ".github/workflows/main.yml"]` is changed in the `main` or `master` branch. Feel free to modify this behavior.
    
-5. If your Github action was successful, you'll see a newly created package under [Packages](https://github.com/orgs/ucsd-ets/packages?repo_name=datahub-example-notebook)
+4. If your Github action was successful, you'll see a newly created package under [Packages](https://github.com/orgs/ucsd-ets/packages?repo_name=datahub-example-notebook)
 
 For more information, check out the syntax for Github Actions and relevant documentation, [here](https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions).
 
