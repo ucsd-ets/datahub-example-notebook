@@ -37,7 +37,7 @@ Building and maintaining a Docker image follows three essential steps: build, sh
   - The example at line 19 installs a system utility called `htop`.
   - Specify more packages as extra arguments: `apt-get -y install htop ping`
 
-### Step 1.3 Python Libraries
+### Step 1.3a Python Libraries
 
 - Note: It is recommended to use `pip` instead of `conda` as much as possible. `pip` is more forgiving in resolving package conflicts, and generally much faster.
 
@@ -52,6 +52,19 @@ Building and maintaining a Docker image follows three essential steps: build, sh
 
 - Leave the rest of the Dockerfile as is
 
+### Step 1.3b R Libraries (If Needed)
+
+- Note: It is recommended to use the "install.packages" command in your Dockerfile instead of Conda whenver possible. This is because installing Conda packages increases the build time exponentially. Example:
+
+  ```
+  RUN R -e "install.packages( \
+          c('ggplot2', \
+            'dplyr'), repos='http://cran.rstudio.com/')"
+  ```
+  If you cannot use cran to install your libraries, try using conda-forge in your Dockerfile instead. Example:
+  ```
+  RUN conda install -c conda-forge r-magick r-tesseract r-pdftools
+  ```
 
 ## Step 2: Build the Image
 
