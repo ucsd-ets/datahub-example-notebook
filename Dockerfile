@@ -4,7 +4,7 @@
 # base notebook, contains Jupyter and relevant tools
 # See https://github.com/ucsd-ets/datahub-docker-stack/wiki/Stable-Tag 
 # for a list of the most current containers we maintain
-ARG BASE_CONTAINER=ucsdets/datahub-base-notebook:2023.1-stable
+ARG BASE_CONTAINER=ghcr.io/ucsd-ets/datascience-notebook:2023.2-stable
 
 FROM $BASE_CONTAINER
 
