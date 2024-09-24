@@ -18,6 +18,16 @@ jobs:
     steps:
       - name: Checkout notebook
         uses: actions/checkout@v3
+
+      - name: Docker/ENV cleanup Cleanup
+        run: |
+          docker image prune -a -f
+          docker container prune -f
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
  
       - name: Log in to registry
         uses: docker/login-action@v2
